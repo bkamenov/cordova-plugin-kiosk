@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="cordova-plugin-kiosk" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins" xmlns:android="http://schemas.android.com/apk/res/android">
+  <name>KioskPlugin</name>
+
+  <js-module src="www/kiosk.js" name="kiosk">
+    <clobbers target="cordova.plugins.kiosk" />
+  </js-module>
+
+  <platform name="android">
+     <!-- Permissions and receiver inside <application> -->
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+      <receiver android:name="com.even.plugin.BootReceiver"
+                android:enabled="true"
+                android:exported="true">
+        <intent-filter>
+          <action android:name="android.intent.action.BOOT_COMPLETED" />
+        </intent-filter>
+      </receiver>
+    </config-file>
+
+    <!-- Permissions at root level -->
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    </config-file>
+
+    <!-- Intent filters for launcher -->
+    <config-file target="AndroidManifest.xml" parent="/manifest/application/activity[@android:name='MainActivity']">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.HOME" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </config-file>
+
+    <!-- Fix launchMode -->
+    <edit-config file="AndroidManifest.xml" target="/manifest/application/activity[@android:name='MainActivity']" mode="merge">
+      <activity android:launchMode="singleTask"/>
+    </edit-config>
+
+    <config-file parent="/*" target="res/xml/config.xml">
+      <feature name="KioskPlugin">
+        <param name="android-package" value="com.even.plugin.KioskPlugin" />
+      </feature>
+    </config-file>
+
+    <source-file src="src/android/KioskPlugin.java" target-dir="src/com/even/plugin" />
+    <source-file src="src/android/BootReceiver.java" target-dir="src/com/even/plugin" />
+  </platform>
+</plugin>
