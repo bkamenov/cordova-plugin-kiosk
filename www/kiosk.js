@@ -8,6 +8,10 @@ exports.disableImmersiveMode = function (success, error) {
   exec(success, error, 'KioskPlugin', 'disableImmersiveMode', []);
 };
 
+exports.isInForeground = function (success, error) {
+  exec(success, error, 'KioskPlugin', 'isInForeground', []);
+};
+
 exports.isLauncher = function (success, error) {
   exec(success, error, 'KioskPlugin', 'isLauncher', []);
 };

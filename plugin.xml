@@ -21,7 +21,6 @@
     <!-- Permissions at root level -->
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-      <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     </config-file>
 
     <!-- Intent filters for launcher -->

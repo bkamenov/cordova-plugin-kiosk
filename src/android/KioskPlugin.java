@@ -3,6 +3,7 @@ package com.even.plugin;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.app.ActivityManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.graphics.Color;
@@ -11,6 +12,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.MotionEvent;
+
+import java.util.List;
 
 import org.apache.cordova.*;
 import org.json.JSONArray;
@@ -31,6 +34,10 @@ public class KioskPlugin extends CordovaPlugin {
       case "disableImmersiveMode":
         disableImmersiveMode();
         callbackContext.success("Immersive mode disabled");
+        return true;
+
+      case "isInForeground":
+        isInForeground(callbackContext);
         return true;
 
       case "isLauncher":
@@ -59,6 +66,31 @@ public class KioskPlugin extends CordovaPlugin {
     boolean isDefaultLauncher = currentHomePackage.equals(appPackage);
     PluginResult result = new PluginResult(PluginResult.Status.OK, isDefaultLauncher);
     callbackContext.sendPluginResult(result);
+  }
+
+  private void isInForeground(CallbackContext callbackContext) {
+    Context context = cordova.getContext();
+    String packageName = context.getPackageName();
+
+    ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    if (am == null) {
+      callbackContext.error("ActivityManager not available");
+      return;
+    }
+
+    List<ActivityManager.RunningAppProcessInfo> processes = am.getRunningAppProcesses();
+    if (processes != null) {
+      for (ActivityManager.RunningAppProcessInfo process : processes) {
+        if (process.processName.equals(packageName)) {
+          boolean isForeground = process.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+          PluginResult result = new PluginResult(PluginResult.Status.OK, isForeground);
+          callbackContext.sendPluginResult(result);
+          return;
+        }
+      }
+    }
+
+    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, false));
   }
 
   private void enableImmersiveMode() {
